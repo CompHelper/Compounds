@@ -109,7 +109,7 @@ class UploadPhoto(Resource):
 
     def patch(self):
         rp = RequestParser()
-        rp.add_argument('id', type=int, required=True, location='json', help='This parameter is missing')
+        rp.add_argument('id', type=int, required=True, location='form', help='This parameter is missing')
         rp.add_argument('photo', type=parser.image, required=True, location='files')  # request.files.get('photo')
         args = rp.parse_args()
         image_file, file_type = args.photo
