@@ -1,8 +1,8 @@
-import json
-from flask_restful import Resource, inputs
+from flask_restful import Resource
 from flask import g, current_app
 from sqlalchemy.exc import SQLAlchemyError
 from flask_restful.reqparse import RequestParser
+
 
 from models.compound import Compound, CompoundProfile
 from models import db
@@ -13,22 +13,31 @@ from utils import parser
 class CompoundBasic(Resource):
 
     def get(self):
+        # 校验参数  查询参数
+        jp = RequestParser()
+        jp.add_argument('page', type=int, location='args',help='This parameter is missing')
+        jp.add_argument('size', type=int, location='args',help='This parameter is missing')
+        args = jp.parse_args()
+        # 数据库 查询
         try:
-            comp = Compound.query.filter(Compound.status == 1).all()
+            comp = Compound.query.filter(Compound.status == 1).paginate(args.page,args.size)
+            # 返回结果
+            data = []
+            for item in comp.items:
+                ret = {}
+                ret['id'] = item.id
+                ret['cas'] = item.cas
+                ret['chinese_name'] = item.cname
+                ret['english_name'] = item.ename
+                ret['Molecular_formula'] = item.Mf
+                ret['Molecular_weight'] = item.Mw
+                ret['Structural_formula'] = current_app.config['BASE_IMAGE_URL'] + item.photo if item.photo else None
+                data.append(ret)
+            return data, 200
         except SQLAlchemyError as e:
             current_app.logger.error(e)
-        data = []
-        for item in comp:
-            ret = {}
-            ret['id'] = item.id
-            ret['cas'] = item.cas
-            ret['chinese_name'] = item.cname
-            ret['english_name'] = item.ename
-            ret['Molecular_formula'] = item.Mf
-            ret['Molecular_weight'] = item.Mw
-            ret['Structural_formula'] = item.photo
-            data.append(ret)
-        return data
+            return {'message': 'Select Compound Failure'},400
+
 
     def post(self):
         # 1 校验参数

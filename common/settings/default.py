@@ -25,6 +25,5 @@ class DefaultConfig(object):
     OSS_ACCESSKEYSERCET = 'oqnoaV1dbhSLi4JCu2R0kbMdI7uIIx'
     OSS_ENDPOINT = 'oss-cn-beijing.aliyuncs.com'
     OSS_BUCKET = 'compounds'
+    BASE_IMAGE_URL = 'https://'+ OSS_BUCKET+'.'+OSS_ENDPOINT + '/'
 
-    # 文件上传路径
-    UPLOAD_PATH = '../upload'
